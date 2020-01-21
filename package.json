@@ -10,10 +10,5 @@
   "dependencies": {
     "luamin": "^1.0.4",
     "nodemon": "^2.0.2"
-  },
-  "devDependencies": {
-    "@types/node": "^13.1.8",
-    "ts-node": "^8.6.2",
-    "typescript": "^3.7.5"
   }
 }

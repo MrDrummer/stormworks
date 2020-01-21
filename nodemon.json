@@ -4,5 +4,5 @@
     "src"
   ],
   "ext": "lua",
-  "exec": "ts-node index.ts"
+  "exec": "node index.js"
 }
