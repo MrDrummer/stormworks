@@ -50,6 +50,6 @@ function onDraw()
 	screen.drawMap(mapCenter.X, mapCenter.Y, zoomLevel)
 	screen.setColor(245, 135, 66)
 	screen.drawCircleF(currentX, currentY, 3)
-	-- screen.setColor(255, 0, 0)
-	-- screen.drawCircleF(screenInput1X, screenInput1Y, 3)
+	screen.setColor(255, 0, 0)
+	screen.drawCircleF(screenInput1X, screenInput1Y, 3)
 end
