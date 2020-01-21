@@ -1,0 +1,8 @@
+{
+  "verbose": true,
+  "watch": [
+    "src"
+  ],
+  "ext": "lua",
+  "exec": "ts-node index.ts"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "stormworks",
+  "version": "0.1.0",
+  "description": "Auto compile Lua on save",
+  "main": "lib/index.js",
+  "repository": "https://github.com/MrDrummer/treeLight.git",
+  "author": "MrDrummer25 <mrdrummer.programming@hotmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "luamin": "^1.0.4",
+    "nodemon": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^13.1.8",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
+  }
+}
