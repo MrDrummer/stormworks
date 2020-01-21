@@ -1,55 +1,72 @@
--- 245, 135, 66 waypoint red
--- 19, 65, 138 line blue
+Colours = {
+	point = { 245, 135, 66 },
+	activePoint = { 237, 189, 76 },
+	pointLine = { 62, 115, 199 },
+	currentPos = { 84, 235, 61 },
+	otherPos = { 59, 237, 178 }
+}
 
-mapCenter = {}
-mapCenter.X = 0
-mapCenter.Y = 0
+-- initial value
+MapCenter = { X = 0, Y = 0 }
+ScreenInput1 = { X = 0, Y = 0 }
+ScreenInput2 = { X = 0, Y = 0 }
+CurrentPos = { X = 0, Y = 0 }
+OtherPos = { X = 0, Y = 0 }
 
-panRelative = 20
+PanSpeed = 20
+
+Waypoints = {}
 
 function onTick()
-	screenInput1X = input.getNumber(3)
-	screenInput1Y = input.getNumber(4)
-	screenInput2X = input.getNumber(5)
-	screenInput2Y = input.getNumber(6)
-	zoomLevel = input.getNumber(7)
-	panBy = zoomLevel * panRelative
-	currentX = input.getNumber(8)
-	currentY = input.getNumber(9)
-	otherX = 200 -- input.getNumber(10)
-	otherY = 200 -- input.getNumber(11)
-	panLeft = input.getBool(3)
-	panRight = input.getBool(4)
-	panUp = input.getBool(5)
-	panDown = input.getBool(6)
-	centerOnShip = input.getBool(9)
-	centerOnOther = input.getBool(10)
+	ZoomLevel = input.getNumber(7)
+	PanBy = ZoomLevel * PanSpeed
 
-	if panLeft then
-		mapCenter.X = mapCenter.X - panBy
-	elseif panRight then
-		mapCenter.X = mapCenter.X + panBy
-	elseif panUp then
-		mapCenter.Y = mapCenter.Y + panBy
-	elseif panDown then
-		mapCenter.Y = mapCenter.Y - panBy
-	elseif centerOnShip then
-		mapCenter.X = currentX
-		mapCenter.Y = currentY
-	elseif centerOnOther then
-		mapCenter.X = otherX
-		mapCenter.Y = otherY
+	CurrentPos = { X = input.getNumber(8), Y = input.getNumber(9) }
+	OtherPos = { X = 200, Y = 200 }
+	-- otherPos = { X =input.getNumber(10), Y = input.getNumber(11) }
+	
+	ScreenInput1 = { X = input.getNumber(3), Y = input.getNumber(4), pressed = input.getBool(1) }
+	ScreenInput2 = { X = input.getNumber(6), Y = input.getNumber(7), pressed = input.getBool(2) }
+
+	PanLeft = input.getBool(3)
+	PanRight = input.getBool(4)
+	PanUp = input.getBool(5)
+	PanDown = input.getBool(6)
+	LastWaypoint = input.getBool(7)
+	NextWaypoint = input.getBool(8)
+	CenterOnShip = input.getBool(9)
+	CenterOnOther = input.getBool(10)
+
+	if PanLeft then
+		MapCenter.X = MapCenter.X - PanBy
+	elseif PanRight then
+		MapCenter.X = MapCenter.X + PanBy
+	elseif PanUp then
+		MapCenter.Y = MapCenter.Y + PanBy
+	elseif PanDown then
+		MapCenter.Y = MapCenter.Y - PanBy
+	elseif CenterOnShip then
+		MapCenter = CurrentPos
+	elseif CenterOnOther then
+		MapCenter = OtherPos
+	elseif LastWaypoint then
+		--
+	elseif NextWaypoint then
+
 	end
-
-	waypoints = {}
 end
 
 function onDraw()
-	w = screen.getWidth()
-	h = screen.getHeight()
-	screen.drawMap(mapCenter.X, mapCenter.Y, zoomLevel)
+	ScreenW = screen.getWidth()
+	ScreenH = screen.getHeight()
+
+	if CurrentPos.X and CurrentPos.Y then
+		CurrentXPixel, CurrentYPixel = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, ScreenW, ScreenH, CurrentPos.X, CurrentPos.Y)
+	end
+
+	screen.drawMap(MapCenter.X, MapCenter.Y, ZoomLevel)
 	screen.setColor(245, 135, 66)
-	screen.drawCircleF(currentX, currentY, 3)
+	screen.drawCircleF(CurrentXPixel, CurrentYPixel, 3)
 	screen.setColor(255, 0, 0)
-	screen.drawCircleF(screenInput1X, screenInput1Y, 3)
+	screen.drawCircleF(ScreenInput1.X, ScreenInput1.Y, 3)
 end
