@@ -3,6 +3,7 @@
         "map",
         "input",
         "onTick",
-        "onDraw"
+        "onDraw",
+        "screen"
     ]
 }

@@ -16,17 +16,54 @@ OtherPos = { X = 0, Y = 0 }
 PanSpeed = 20
 
 Waypoints = {}
+WaypointCount = 0
+SelectedWaypoint = 0
+
+function AddWaypoint(wp)
+	-- Is a valid waypoint
+	if wp.X ~= nil and wp.Y ~= nil then
+		table.insert(Waypoints, wp)
+		WaypointCount = WaypointCount + 1
+	end
+end
 
 function onTick()
 	ZoomLevel = input.getNumber(7)
 	PanBy = ZoomLevel * PanSpeed
+	CurrentPos = {
+		X = input.getNumber(8),
+		Y = input.getNumber(9),
+		mapScreenX = 0,
+		mapScreenY = 0
+	}
 
-	CurrentPos = { X = input.getNumber(8), Y = input.getNumber(9) }
-	OtherPos = { X = 200, Y = 200 }
+	OtherPos = {
+		X = 200,
+		Y = 200,
+		mapScreenX = 0,
+		mapScreenY = 0
+	}
 	-- otherPos = { X =input.getNumber(10), Y = input.getNumber(11) }
-	
-	ScreenInput1 = { X = input.getNumber(3), Y = input.getNumber(4), pressed = input.getBool(1) }
-	ScreenInput2 = { X = input.getNumber(6), Y = input.getNumber(7), pressed = input.getBool(2) }
+
+	ScreenInput1 = {
+		inputX = input.getNumber(3),
+		inputY = input.getNumber(4),
+		pressed = input.getBool(1),
+		mapX = 0,
+		mapY = 0,
+		mapScreenX = 0,
+		mapScreenY = 0
+	}
+
+	ScreenInput2 = {
+		inputX = input.getNumber(6),
+		inputY = input.getNumber(7),
+		pressed = input.getBool(2),
+		mapX = 0,
+		mapY = 0,
+		mapScreenX = 0,
+		mapScreenY = 0
+	}
 
 	PanLeft = input.getBool(3)
 	PanRight = input.getBool(4)
@@ -50,23 +87,53 @@ function onTick()
 	elseif CenterOnOther then
 		MapCenter = OtherPos
 	elseif LastWaypoint then
-		--
+		-- NEED TO HAVE TOGGLE ON TOGGLE OFF OTHERWISE PRESSING AND HOLDING WILL KEEP ADDING TO THE TABLE!!!!
 	elseif NextWaypoint then
-
+		-- NEED TO HAVE TOGGLE ON TOGGLE OFF OTHERWISE PRESSING AND HOLDING WILL KEEP ADDING TO THE TABLE!!!!
+		if ScreenInput1.inputX == nil then
+			-- Has not selected the next position since spawning
+			return
+		end
+		-- NEED TO HAVE TOGGLE ON TOGGLE OFF OTHERWISE PRESSING AND HOLDING WILL KEEP ADDING TO THE TABLE!!!!
+		AddWaypoint( ScreenInput1 )
+	elseif ScreenInput1.pressed then
+		ScreenInput1.mapX, ScreenInput1.mapY = map.screenToMap(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, ScreenInput1.inputX, ScreenInput1.inputY)
 	end
 end
 
 function onDraw()
-	ScreenW = screen.getWidth()
-	ScreenH = screen.getHeight()
-
-	if CurrentPos.X and CurrentPos.Y then
-		CurrentXPixel, CurrentYPixel = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, ScreenW, ScreenH, CurrentPos.X, CurrentPos.Y)
-	end
+	S = {
+		W = screen.getWidth(),
+		H = screen.getHeight()
+	}
 
 	screen.drawMap(MapCenter.X, MapCenter.Y, ZoomLevel)
-	screen.setColor(245, 135, 66)
-	screen.drawCircleF(CurrentXPixel, CurrentYPixel, 3)
-	screen.setColor(255, 0, 0)
-	screen.drawCircleF(ScreenInput1.X, ScreenInput1.Y, 3)
+
+	-- Current position rendered on the map
+	if CurrentPos.X ~= nil and CurrentPos.Y ~= nil then
+		CurrentPos.mapScreenX, CurrentPos.mapScreenY = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, CurrentPos.X, CurrentPos.Y)
+		screen.setColor(table.unpack(Colours.currentPos))
+		screen.drawCircleF(CurrentPos.mapScreenX, CurrentPos.mapScreenY, 3)
+	end
+	
+	-- Other position rendered on the map
+	if OtherPos.X ~= nil and OtherPos.Y ~= nil then
+		OtherPos.mapScreenX, OtherPos.mapScreenY = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, OtherPos.X, OtherPos.Y)
+		screen.setColor(table.unpack(Colours.OtherPos))
+		screen.drawCircleF(OtherPos.mapScreenX, OtherPos.mapScreenY, 3)
+	end
+
+	-- Input 1 position rendered on the map
+	if ScreenInput1.X ~= nil and ScreenInput1.Y ~= nil then
+		ScreenInput1.mapScreenX, ScreenInput1.mapScreenY = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, ScreenInput1.mapX, ScreenInput1.mapY)
+		screen.setColor(table.unpack(Colours.activePoint))
+		screen.drawCircleF(ScreenInput1.mapScreenX, ScreenInput1.mapScreenY, 3)
+	end
+
+
+
+
+	-- if ScreenInput1.inputX ~= nil then
+	-- 	screen.setColor(table.unpack(Colours.pointLine))
+	-- end
 end
