@@ -2,8 +2,8 @@
 -- 19, 65, 138 line blue
 
 mapCenter = {}
-mapCenter.X = currentX
-mapCenter.Y = currentY
+mapCenter.X = 0
+mapCenter.Y = 0
 
 panRelative = 20
 
@@ -14,15 +14,14 @@ function onTick()
 	screenInput2Y = input.getNumber(6)
 	zoomLevel = input.getNumber(7)
 	panBy = zoomLevel * panRelative
-	output.setNumber(1, panBy)
 	currentX = input.getNumber(8)
 	currentY = input.getNumber(9)
 	otherX = 200 -- input.getNumber(10)
 	otherY = 200 -- input.getNumber(11)
 	panLeft = input.getBool(3)
 	panUp = input.getBool(4)
-	panRight = input.getBool(5)
-	panDown = input.getBool(6)
+	panDown = input.getBool(5)
+	panRight = input.getBool(6)
 	centerOnShip = input.getBool(9)
 	centerOnOther = input.getBool(10)
 
