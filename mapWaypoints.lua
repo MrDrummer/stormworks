@@ -19,24 +19,20 @@ function onTick()
 	otherX = 200 -- input.getNumber(10)
 	otherY = 200 -- input.getNumber(11)
 	panLeft = input.getBool(3)
-	panUp = input.getBool(4)
-	panDown = input.getBool(5)
-	panRight = input.getBool(6)
+	panRight = input.getBool(4)
+	panUp = input.getBool(5)
+	panDown = input.getBool(6)
 	centerOnShip = input.getBool(9)
 	centerOnOther = input.getBool(10)
 
 	if panLeft then
-		local x = mapCenter.X
-		mapCenter.X = x - panBy
+		mapCenter.X = mapCenter.X - panBy
 	elseif panRight then
-		local x = mapCenter.X
-		mapCenter.X = x + panBy
+		mapCenter.X = mapCenter.X + panBy
 	elseif panUp then
-		local y = mapCenter.Y
-		mapCenter.Y = y - panBy
+		mapCenter.Y = mapCenter.Y + panBy
 	elseif panDown then
-		local y = mapCenter.Y
-		mapCenter.Y = y + panBy
+		mapCenter.Y = mapCenter.Y - panBy
 	elseif centerOnShip then
 		mapCenter.X = currentX
 		mapCenter.Y = currentY
