@@ -64,6 +64,14 @@ function AddWaypoint(wp)
 	end
 end
 
+function RenderPoint(point, colour, screen)
+	if point.mapX ~= nil and point.mapY ~= nil then
+		point.mapScreenX, point.mapScreenY = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, point.mapX, point.mapY)
+		screen.setColor(table.unpack(Colours[colour]))
+		screen.drawCircleF(point.mapScreenX, point.mapScreenY, 3)
+	end
+end
+
 function onTick()
 	ZoomLevel = input.getNumber(7)
 	PanBy = ZoomLevel * PanSpeed
@@ -72,7 +80,7 @@ function onTick()
 
 	OtherPos.mapX = 200
 	OtherPos.mapY = 200
-	
+
 	-- otherPos = { X =input.getNumber(10), Y = input.getNumber(11) }
 
 	ScreenInput1.inputX = input.getNumber(3)
@@ -133,33 +141,13 @@ function onDraw()
 
 	screen.drawMap(MapCenter.X, MapCenter.Y, ZoomLevel)
 
-	-- Current position rendered on the map
-	if CurrentPos.mapX ~= nil and CurrentPos.mapY ~= nil then
-		CurrentPos.mapScreenX, CurrentPos.mapScreenY = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, CurrentPos.mapX, CurrentPos.mapY)
-		-- print(CurrentPos.mapScreenX)
-		-- print(CurrentPos.mapScreenY)
-		screen.setColor(table.unpack(Colours.currentPos))
-		screen.drawCircleF(CurrentPos.mapScreenX, CurrentPos.mapScreenY, 3)
-	end
-	
-	-- Other position rendered on the map
-	if OtherPos.mapX ~= nil and OtherPos.mapY ~= nil then
-		OtherPos.mapScreenX, OtherPos.mapScreenY = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, OtherPos.mapX, OtherPos.mapY)
-		screen.setColor(table.unpack(Colours.otherPos))
-		screen.drawCircleF(OtherPos.mapScreenX, OtherPos.mapScreenY, 3)
+	if ScreenInput1.mapX ~= nil and ScreenInput1.mapY ~= nil and CurrentPos.mapX ~= nil and CurrentPos.mapY ~= nil then
+		screen.setColor(table.unpack(Colours.pointLine))
+		screen.drawLine(ScreenInput1.mapScreenX, ScreenInput1.mapScreenY, CurrentPos.mapScreenX, CurrentPos.mapScreenY)
 	end
 
-	-- Input 1 position rendered on the map
-	if ScreenInput1.mapX ~= nil and ScreenInput1.mapY ~= nil then
-		ScreenInput1.mapScreenX, ScreenInput1.mapScreenY = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, ScreenInput1.mapX, ScreenInput1.mapY)
-		screen.setColor(table.unpack(Colours.activePoint))
-		screen.drawCircleF(ScreenInput1.mapScreenX, ScreenInput1.mapScreenY, 3)
-	end
+	RenderPoint(CurrentPos, "currentPos", screen)
+	RenderPoint(OtherPos, "otherPos", screen)
+	RenderPoint(ScreenInput1, "point", screen)
 
-
-
-
-	-- if ScreenInput1.inputX ~= nil then
-	-- 	screen.setColor(table.unpack(Colours.pointLine))
-	-- end
 end
