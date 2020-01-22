@@ -175,7 +175,7 @@ function onDraw()
 	end
 
 	if WaypointCount >= 0 and ScreenInput1 ~= nil then
-		RenderLine(Waypoints[1], ScreenInput1, screen)
+		RenderLine(Waypoints[WaypointCount], ScreenInput1, screen)
 	end
 
 	RenderPoint(CurrentPos, "currentPos", screen)
