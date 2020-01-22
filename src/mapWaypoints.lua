@@ -12,7 +12,7 @@ PanSpeed = 20
 -- initial values
 Waypoints = {}
 WaypointCount = 0
-SelectedWaypoint = 0
+ActiveWaypoint = 0
 
 MapCenter = { X = 0, Y = 0 }
 
@@ -58,7 +58,9 @@ ScreenInput2 = {
 
 function AddWaypoint(wp)
 	-- Is a valid waypoint
-	if wp.X ~= nil and wp.Y ~= nil then
+	if wp.mapX ~= nil and wp.mapY ~= nil then
+		wp.inputX = nil
+		wp.inputY = nil
 		table.insert(Waypoints, wp)
 		WaypointCount = WaypointCount + 1
 	end
@@ -72,10 +74,10 @@ function RenderPoint(point, colour, screen)
 	end
 end
 
-function RenderLine(point1, point2, colour, screen)
+function RenderLine(point1, point2, screen)
 
-	if point1.mapX ~= nil and point1.mapY ~= nil and point2.mapX ~= nil and point2.mapY ~= nil then
-		screen.setColor(table.unpack(Colours[colour]))
+	if point1 ~= nil and point2 ~= nil and point1.mapX ~= nil and point1.mapY ~= nil and point2.mapX ~= nil and point2.mapY ~= nil then
+		screen.setColor(table.unpack(Colours.pointLine))
 		screen.drawLine(point1.mapScreenX, point1.mapScreenY, point2.mapScreenX, point2.mapScreenY)
 	end
 end
@@ -136,6 +138,7 @@ function onTick()
 			return
 		end
 		AddWaypoint( ScreenInput1 )
+		ActiveWaypoint = 0
 	elseif ScreenInput1.pressed then
 		ScreenInput1.mapX, ScreenInput1.mapY = map.screenToMap(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, ScreenInput1.inputX, ScreenInput1.inputY)
 	end
@@ -149,8 +152,30 @@ function onDraw()
 
 	screen.drawMap(MapCenter.X, MapCenter.Y, ZoomLevel)
 
-	RenderLine(ScreenInput1, CurrentPos, "pointLine", screen)
+	-- RenderLine(ScreenInput1, CurrentPos, screen)
 
+	if WaypointCount >= 0 then
+		RenderLine(CurrentPos, Waypoints[1], screen)
+	end
+
+	for index, point in ipairs(Waypoints) do
+		local colour = "point"
+		if index == ActiveWaypoint then
+			colour = "activePoint"
+		end
+		
+		-- NOT last item
+		if index ~= WaypointCount then
+			RenderLine(point, Waypoints[index + 1], screen)
+		end
+		
+		RenderPoint(point, colour, screen)
+	end
+
+	if WaypointCount >= 0 and ScreenInput1 then
+		RenderLine(Waypoints[1], ScreenInput1, screen)
+	end
+	
 	RenderPoint(CurrentPos, "currentPos", screen)
 	RenderPoint(OtherPos, "otherPos", screen)
 	RenderPoint(ScreenInput1, "point", screen)
