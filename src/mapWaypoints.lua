@@ -6,18 +6,25 @@ Colours = {
 	otherPos = { 59, 237, 178 }
 }
 
--- initial value
-MapCenter = { X = 0, Y = 0 }
-ScreenInput1 = { X = 0, Y = 0 }
-ScreenInput2 = { X = 0, Y = 0 }
-CurrentPos = { mapX = 0, mapY = 0 }
-OtherPos = { mapX = 0, mapY = 0 }
-
 PanSpeed = 20
 
+
+-- initial values
 Waypoints = {}
 WaypointCount = 0
 SelectedWaypoint = 0
+
+MapCenter = { X = 0, Y = 0 }
+
+LastWaypoint = {
+	pressed = false,
+	pressedTick = false
+}
+
+NextWaypoint = {
+	pressed = false,
+	pressedTick = false
+}
 
 CurrentPos = {
 	mapX = 0,
@@ -37,7 +44,6 @@ ScreenInput1 = {
 	inputX = 0,
 	inputY = 0,
 	pressed = 0,
-	pressedTick = 0,
 	mapScreenX = 0,
 	mapScreenY = 0
 }
@@ -46,7 +52,6 @@ ScreenInput2 = {
 	inputX = 0,
 	inputY = 0,
 	pressed = 0,
-	pressedTick = 0,
 	mapScreenX = 0,
 	mapScreenY = 0
 }
@@ -82,8 +87,8 @@ function onTick()
 	PanRight = input.getBool(4)
 	PanUp = input.getBool(5)
 	PanDown = input.getBool(6)
-	LastWaypoint = input.getBool(7)
-	NextWaypoint = input.getBool(8)
+	LastWaypoint.pressed = input.getBool(7)
+	NextWaypoint.pressed = input.getBool(8)
 	CenterOnShip = input.getBool(9)
 	CenterOnOther = input.getBool(10)
 
@@ -95,27 +100,27 @@ function onTick()
 		MapCenter.Y = MapCenter.Y + PanBy
 	elseif PanDown then
 		MapCenter.Y = MapCenter.Y - PanBy
+
 	elseif CenterOnShip then
 		MapCenter.X = CurrentPos.mapX
 		MapCenter.Y = CurrentPos.mapY
 	elseif CenterOnOther then
 		MapCenter.X = OtherPos.mapX
 		MapCenter.Y = OtherPos.mapY
-	elseif LastWaypoint then
-		-- NEED TO HAVE TOGGLE ON TOGGLE OFF OTHERWISE PRESSING AND HOLDING WILL KEEP ADDING TO THE TABLE!!!!
-	elseif NextWaypoint then
-		-- NEED TO HAVE TOGGLE ON TOGGLE OFF OTHERWISE PRESSING AND HOLDING WILL KEEP ADDING TO THE TABLE!!!!
+
+	elseif LastWaypoint.pressed == false and LastWaypoint.pressedTick == true then
+		LastWaypoint.pressedTick = false
+	elseif NextWaypoint.pressed == false and NextWaypoint.pressedTick == true then
+		NextWaypoint.pressedTick = false
+
+	elseif LastWaypoint.pressed and LastWaypoint.pressedTick == false then
+	elseif NextWaypoint.pressed and NextWaypoint.pressedTick == false then
 		if ScreenInput1.inputX == nil then
 			-- Has not selected the next position since spawning
 			return
 		end
-		-- NEED TO HAVE TOGGLE ON TOGGLE OFF OTHERWISE PRESSING AND HOLDING WILL KEEP ADDING TO THE TABLE!!!!
 		AddWaypoint( ScreenInput1 )
-	elseif ScreenInput1.pressed == true then
-		ScreenInput1.pressedTick = false
-
-	elseif ScreenInput1.pressed and ScreenInput1.pressedTick == false then
-		ScreenInput1.pressedTick = true
+	elseif ScreenInput1.pressed then
 		ScreenInput1.mapX, ScreenInput1.mapY = map.screenToMap(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, ScreenInput1.inputX, ScreenInput1.inputY)
 	end
 end
