@@ -72,6 +72,14 @@ function RenderPoint(point, colour, screen)
 	end
 end
 
+function RenderLine(point1, point2, colour, screen)
+
+	if point1.mapX ~= nil and point1.mapY ~= nil and point2.mapX ~= nil and point2.mapY ~= nil then
+		screen.setColor(table.unpack(Colours[colour]))
+		screen.drawLine(point1.mapScreenX, point1.mapScreenY, point2.mapScreenX, point2.mapScreenY)
+	end
+end
+
 function onTick()
 	ZoomLevel = input.getNumber(7)
 	PanBy = ZoomLevel * PanSpeed
@@ -141,10 +149,7 @@ function onDraw()
 
 	screen.drawMap(MapCenter.X, MapCenter.Y, ZoomLevel)
 
-	if ScreenInput1.mapX ~= nil and ScreenInput1.mapY ~= nil and CurrentPos.mapX ~= nil and CurrentPos.mapY ~= nil then
-		screen.setColor(table.unpack(Colours.pointLine))
-		screen.drawLine(ScreenInput1.mapScreenX, ScreenInput1.mapScreenY, CurrentPos.mapScreenX, CurrentPos.mapScreenY)
-	end
+	RenderLine(ScreenInput1, CurrentPos, "pointLine", screen)
 
 	RenderPoint(CurrentPos, "currentPos", screen)
 	RenderPoint(OtherPos, "otherPos", screen)
