@@ -67,7 +67,7 @@ function AddWaypoint(wp)
 end
 
 function RenderPoint(point, colour, screen)
-	if point.mapX ~= nil and point.mapY ~= nil then
+	if point ~= nil and point.mapX ~= nil and point.mapY ~= nil then
 		point.mapScreenX, point.mapScreenY = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, point.mapX, point.mapY)
 		screen.setColor(table.unpack(Colours[colour]))
 		screen.drawCircleF(point.mapScreenX, point.mapScreenY, 3)
@@ -91,7 +91,7 @@ function onTick()
 	OtherPos.mapX = 200
 	OtherPos.mapY = 200
 
-	-- otherPos = { X =input.getNumber(10), Y = input.getNumber(11) }
+	-- otherPos = { X = input.getNumber(10), Y = input.getNumber(11) }
 
 	ScreenInput1.inputX = input.getNumber(3)
 	ScreenInput1.inputY = input.getNumber(4)
@@ -132,13 +132,15 @@ function onTick()
 		NextWaypoint.pressedTick = false
 
 	elseif LastWaypoint.pressed and LastWaypoint.pressedTick == false then
+		if ActiveWaypoint > 0 then ActiveWaypoint = ActiveWaypoint - 1 end
 	elseif NextWaypoint.pressed and NextWaypoint.pressedTick == false then
 		if ScreenInput1.inputX == nil then
 			-- Has not selected the next position since spawning
 			return
 		end
 		AddWaypoint( ScreenInput1 )
-		ActiveWaypoint = 0
+		ScreenInput1 = {}
+		ActiveWaypoint = ActiveWaypoint + 1
 	elseif ScreenInput1.pressed then
 		ScreenInput1.mapX, ScreenInput1.mapY = map.screenToMap(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, ScreenInput1.inputX, ScreenInput1.inputY)
 	end
@@ -172,12 +174,11 @@ function onDraw()
 		RenderPoint(point, colour, screen)
 	end
 
-	if WaypointCount >= 0 and ScreenInput1 then
+	if WaypointCount >= 0 and ScreenInput1 ~= nil then
 		RenderLine(Waypoints[1], ScreenInput1, screen)
 	end
-	
+
 	RenderPoint(CurrentPos, "currentPos", screen)
 	RenderPoint(OtherPos, "otherPos", screen)
 	RenderPoint(ScreenInput1, "point", screen)
-
 end
