@@ -37,6 +37,7 @@ ScreenInput1 = {
 	inputX = 0,
 	inputY = 0,
 	pressed = 0,
+	pressedTick = 0,
 	mapScreenX = 0,
 	mapScreenY = 0
 }
@@ -45,6 +46,7 @@ ScreenInput2 = {
 	inputX = 0,
 	inputY = 0,
 	pressed = 0,
+	pressedTick = 0,
 	mapScreenX = 0,
 	mapScreenY = 0
 }
@@ -60,28 +62,21 @@ end
 function onTick()
 	ZoomLevel = input.getNumber(7)
 	PanBy = ZoomLevel * PanSpeed
-	CurrentPos = {
-		mapX = input.getNumber(8),
-		mapY = input.getNumber(9),
-	}
+	CurrentPos.mapX = input.getNumber(8)
+	CurrentPos.mapY = input.getNumber(9)
 
-	OtherPos = {
-		mapX = 200,
-		mapY = 200,
-	}
+	OtherPos.mapX = 200
+	OtherPos.mapY = 200
+	
 	-- otherPos = { X =input.getNumber(10), Y = input.getNumber(11) }
 
-	ScreenInput1 = {
-		inputX = input.getNumber(3),
-		inputY = input.getNumber(4),
-		pressed = input.getBool(1),
-	}
+	ScreenInput1.inputX = input.getNumber(3)
+	ScreenInput1.inputY = input.getNumber(4)
+	ScreenInput1.pressed = input.getBool(1)
 
-	ScreenInput2 = {
-		inputX = input.getNumber(6),
-		inputY = input.getNumber(7),
-		pressed = input.getBool(2),
-	}
+	ScreenInput2.inputX = input.getNumber(6)
+	ScreenInput2.inputY = input.getNumber(7)
+	ScreenInput2.pressed = input.getBool(2)
 
 	PanLeft = input.getBool(3)
 	PanRight = input.getBool(4)
@@ -116,7 +111,11 @@ function onTick()
 		end
 		-- NEED TO HAVE TOGGLE ON TOGGLE OFF OTHERWISE PRESSING AND HOLDING WILL KEEP ADDING TO THE TABLE!!!!
 		AddWaypoint( ScreenInput1 )
-	elseif ScreenInput1.pressed then
+	elseif ScreenInput1.pressed == true then
+		ScreenInput1.pressedTick = false
+
+	elseif ScreenInput1.pressed and ScreenInput1.pressedTick == false then
+		ScreenInput1.pressedTick = true
 		ScreenInput1.mapX, ScreenInput1.mapY = map.screenToMap(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, ScreenInput1.inputX, ScreenInput1.inputY)
 	end
 end
