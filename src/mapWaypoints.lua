@@ -76,6 +76,23 @@ function AddWaypoint(wp)
 	end
 end
 
+function RemoveWaypoint(index)
+	table.remove(Waypoints, index)
+	DecreaseBy(WaypointCount, 1)
+
+	if ActiveWaypoint > WaypointCount then
+		ActiveWaypoint = WaypointCount
+	end
+end
+
+function IncreaseBy(value, by)
+	return value + by
+end
+
+function DecreaseBy(value, by)
+	return value - by
+end
+
 function RenderPoint(point, colour, screen)
 	if point ~= nil and point.mapX ~= nil and point.mapY ~= nil then
 		point.mapScreenX, point.mapScreenY = map.mapToScreen(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, point.mapX, point.mapY)
@@ -93,11 +110,19 @@ function RenderLine(point1, point2, screen)
 end
 
 function onTick()
-	if ActiveWaypoint < 0 then ActiveWaypoint = 0 end
-	if WaypointCount > 0 then
-		output.setNumber(1, Waypoints[1].mapX)
-		output.setNumber(2, Waypoints[1].mapY)
+	if ActiveWaypoint < 0 then
+		ActiveWaypoint = 0
 	end
+
+	if ActiveWaypoint > WaypointCount then
+		ActiveWaypoint = WaypointCount
+	end
+
+	-- if WaypointCount > 0 then
+	-- 	output.setNumber(1, Waypoints[1].mapX)
+	-- 	output.setNumber(2, Waypoints[1].mapY)
+	-- end
+
 	ZoomLevel = input.getNumber(7)
 	PanBy = ZoomLevel * PanSpeed
 	CurrentPos.mapX = input.getNumber(8)
@@ -127,14 +152,17 @@ function onTick()
 	RemoveFirstWaypoint.pressed = input.getBool(11)
 	RemoveActiveWaypoint.pressed = input.getBool(12)
 
+	output.setNumber(3, ActiveWaypoint)
+	output.setNumber(4, WaypointCount)
+
 	if PanLeft then
-		MapCenter.X = MapCenter.X - PanBy
+		IncreaseBy(MapCenter.X, PanBy)
 	elseif PanRight then
-		MapCenter.X = MapCenter.X + PanBy
+		DecreaseBy(MapCenter.X, PanBy)
 	elseif PanUp then
-		MapCenter.Y = MapCenter.Y + PanBy
+		IncreaseBy(MapCenter.Y, PanBy)
 	elseif PanDown then
-		MapCenter.Y = MapCenter.Y - PanBy
+		DecreaseBy(MapCenter.Y, PanBy)
 
 	elseif CenterOnShip then
 		MapCenter.X = CurrentPos.mapX
@@ -143,29 +171,29 @@ function onTick()
 		MapCenter.X = OtherPos.mapX
 		MapCenter.Y = OtherPos.mapY
 
-	elseif LastWaypoint.pressed == false and LastWaypoint.pressedTick == true then
+	elseif not LastWaypoint.pressed and LastWaypoint.pressedTick then
 		LastWaypoint.pressedTick = false
-	elseif NextWaypoint.pressed == false and NextWaypoint.pressedTick == true then
+	elseif not NextWaypoint.pressed and NextWaypoint.pressedTick then
 		NextWaypoint.pressedTick = false
-	elseif RemoveFirstWaypoint.pressed == false and RemoveFirstWaypoint.pressedTick == true then
+	elseif not RemoveFirstWaypoint.pressed and RemoveFirstWaypoint.pressedTick then
 		RemoveFirstWaypoint.pressedTick = false
-	elseif RemoveActiveWaypoint.pressed == false and RemoveActiveWaypoint.pressedTick == true then
+	elseif not RemoveActiveWaypoint.pressed and RemoveActiveWaypoint.pressedTick then
 		RemoveActiveWaypoint.pressedTick = false
 
-	elseif RemoveFirstWaypoint.pressed and RemoveFirstWaypoint.pressedTick == false then
-		table.remove(Waypoints, 1)
-		WaypointCount = WaypointCount - 1
+	elseif RemoveFirstWaypoint.pressed and not RemoveFirstWaypoint.pressedTick then
+		RemoveWaypoint(1)
+		RemoveFirstWaypoint.pressedTick = true
 
-	elseif RemoveActiveWaypoint.pressed and RemoveActiveWaypoint.pressedTick == false then
-		table.remove(Waypoints, ActiveWaypoint)
-		WaypointCount = WaypointCount - 1
-		
-	elseif LastWaypoint.pressed and LastWaypoint.pressedTick == false then
+	elseif RemoveActiveWaypoint.pressed and not RemoveActiveWaypoint.pressedTick then
+		RemoveWaypoint(ActiveWaypoint)
+		RemoveActiveWaypoint.pressedTick = true
+
+	elseif LastWaypoint.pressed and not LastWaypoint.pressedTick then
 		LastWaypoint.pressedTick = true
 		if ActiveWaypoint > 0 then
-			ActiveWaypoint = ActiveWaypoint - 1
+			DecreaseBy(ActiveWaypoint, 1)
 		end
-	elseif NextWaypoint.pressed and NextWaypoint.pressedTick == false then
+	elseif NextWaypoint.pressed and not NextWaypoint.pressedTick then
 		NextWaypoint.pressedTick = true
 		if ScreenInput1.inputX == 0 and ScreenInput1.inputY == 0 then
 			-- Has not selected the next position since spawning
@@ -177,11 +205,12 @@ function onTick()
 			AddWaypoint( ScreenInput1 )
 			ScreenInput1 = {}
 		elseif ActiveWaypoint < WaypointCount then
-			
+
 		else
 			return
 		end
 		ActiveWaypoint = ActiveWaypoint + 1
+		IncreaseBy(ActiveWaypoint, 1)
 	elseif ScreenInput1.pressed then
 		ScreenInput1.mapX, ScreenInput1.mapY = map.screenToMap(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, ScreenInput1.inputX, ScreenInput1.inputY)
 	end
@@ -213,12 +242,12 @@ function onDraw()
 		if index == ActiveWaypoint then
 			colour = "activePoint"
 		end
-		
+
 		-- NOT last item
 		if index ~= WaypointCount then
 			RenderLine(point, Waypoints[index + 1], screen)
 		end
-		
+
 		RenderPoint(point, colour, screen)
 	end
 
