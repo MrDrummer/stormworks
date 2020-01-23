@@ -4,6 +4,7 @@
         "input",
         "onTick",
         "onDraw",
-        "screen"
+        "screen",
+        "output"
     ]
 }

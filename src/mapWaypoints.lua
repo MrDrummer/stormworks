@@ -1,6 +1,6 @@
 Colours = {
 	point = { 245, 135, 66 },
-	activePoint = { 237, 189, 76 },
+	activePoint = { 242, 64, 15 },
 	pointLine = { 62, 115, 199 },
 	currentPos = { 84, 235, 61 },
 	otherPos = { 59, 237, 178 }
@@ -83,6 +83,10 @@ function RenderLine(point1, point2, screen)
 end
 
 function onTick()
+	if ActiveWaypoint < 0 then ActiveWaypoint = 0 end
+	output.setNumber(1, WaypointCount)
+	output.setNumber(2, ActiveWaypoint)
+	output.setNumber(3, ScreenInput1.inputX)
 	ZoomLevel = input.getNumber(7)
 	PanBy = ZoomLevel * PanSpeed
 	CurrentPos.mapX = input.getNumber(8)
@@ -132,17 +136,36 @@ function onTick()
 		NextWaypoint.pressedTick = false
 
 	elseif LastWaypoint.pressed and LastWaypoint.pressedTick == false then
-		if ActiveWaypoint > 0 then ActiveWaypoint = ActiveWaypoint - 1 end
+		LastWaypoint.pressedTick = true
+		if ActiveWaypoint > 0 then
+			ActiveWaypoint = ActiveWaypoint - 1
+		end
 	elseif NextWaypoint.pressed and NextWaypoint.pressedTick == false then
-		if ScreenInput1.inputX == nil then
+		NextWaypoint.pressedTick = true
+		if ScreenInput1.inputX == 0 and ScreenInput1.inputY == 0 then
 			-- Has not selected the next position since spawning
 			return
 		end
-		AddWaypoint( ScreenInput1 )
-		ScreenInput1 = {}
+
+		-- last waypoint or no waypoint is selected
+		if ActiveWaypoint == WaypointCount then
+			AddWaypoint( ScreenInput1 )
+			ScreenInput1 = {}
+		elseif ActiveWaypoint < WaypointCount then
+			
+		else
+			return
+		end
 		ActiveWaypoint = ActiveWaypoint + 1
 	elseif ScreenInput1.pressed then
 		ScreenInput1.mapX, ScreenInput1.mapY = map.screenToMap(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, ScreenInput1.inputX, ScreenInput1.inputY)
+	end
+
+	-- Not the last waypoint
+	if ScreenInput1.pressed and ActiveWaypoint < WaypointCount then
+		Waypoints[ActiveWaypoint].mapX = ScreenInput1.mapX
+		Waypoints[ActiveWaypoint].mapY = ScreenInput1.mapY
+		ScreenInput1 = {}
 	end
 end
 
@@ -172,10 +195,6 @@ function onDraw()
 		end
 		
 		RenderPoint(point, colour, screen)
-	end
-
-	if WaypointCount >= 0 and ScreenInput1 ~= nil then
-		RenderLine(Waypoints[WaypointCount], ScreenInput1, screen)
 	end
 
 	RenderPoint(CurrentPos, "currentPos", screen)
