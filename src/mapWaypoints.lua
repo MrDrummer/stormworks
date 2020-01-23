@@ -2,8 +2,8 @@ Colours = {
 	point = { 245, 135, 66 },
 	activePoint = { 242, 64, 15 },
 	pointLine = { 62, 115, 199 },
-	currentPos = { 84, 235, 61 },
-	otherPos = { 59, 237, 178 }
+	currentPos = { 12, 102, 7 },
+	otherPos = { 7, 102, 92 }
 }
 
 PanSpeed = 20
@@ -77,20 +77,13 @@ function AddWaypoint(wp)
 end
 
 function RemoveWaypoint(index)
+	if WaypointCount == 0 then return end
 	table.remove(Waypoints, index)
-	DecreaseBy(WaypointCount, 1)
+	WaypointCount = WaypointCount - 1
 
 	if ActiveWaypoint > WaypointCount then
 		ActiveWaypoint = WaypointCount
 	end
-end
-
-function IncreaseBy(value, by)
-	return value + by
-end
-
-function DecreaseBy(value, by)
-	return value - by
 end
 
 function RenderPoint(point, colour, screen)
@@ -118,10 +111,10 @@ function onTick()
 		ActiveWaypoint = WaypointCount
 	end
 
-	-- if WaypointCount > 0 then
-	-- 	output.setNumber(1, Waypoints[1].mapX)
-	-- 	output.setNumber(2, Waypoints[1].mapY)
-	-- end
+	if WaypointCount > 0 and Waypoints[1].mapX then
+		output.setNumber(1, Waypoints[1].mapX)
+		output.setNumber(2, Waypoints[1].mapY)
+	end
 
 	ZoomLevel = input.getNumber(7)
 	PanBy = ZoomLevel * PanSpeed
@@ -156,13 +149,13 @@ function onTick()
 	output.setNumber(4, WaypointCount)
 
 	if PanLeft then
-		IncreaseBy(MapCenter.X, PanBy)
+		MapCenter.X = MapCenter.X - PanBy
 	elseif PanRight then
-		DecreaseBy(MapCenter.X, PanBy)
+		MapCenter.X = MapCenter.X + PanBy
 	elseif PanUp then
-		IncreaseBy(MapCenter.Y, PanBy)
+		MapCenter.Y = MapCenter.Y + PanBy
 	elseif PanDown then
-		DecreaseBy(MapCenter.Y, PanBy)
+		MapCenter.Y = MapCenter.Y - PanBy
 
 	elseif CenterOnShip then
 		MapCenter.X = CurrentPos.mapX
@@ -191,7 +184,7 @@ function onTick()
 	elseif LastWaypoint.pressed and not LastWaypoint.pressedTick then
 		LastWaypoint.pressedTick = true
 		if ActiveWaypoint > 0 then
-			DecreaseBy(ActiveWaypoint, 1)
+			ActiveWaypoint = ActiveWaypoint - 1
 		end
 	elseif NextWaypoint.pressed and not NextWaypoint.pressedTick then
 		NextWaypoint.pressedTick = true
@@ -210,7 +203,6 @@ function onTick()
 			return
 		end
 		ActiveWaypoint = ActiveWaypoint + 1
-		IncreaseBy(ActiveWaypoint, 1)
 	elseif ScreenInput1.pressed then
 		ScreenInput1.mapX, ScreenInput1.mapY = map.screenToMap(MapCenter.X, MapCenter.Y, ZoomLevel, S.W, S.H, ScreenInput1.inputX, ScreenInput1.inputY)
 	end
