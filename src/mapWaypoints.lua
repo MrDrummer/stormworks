@@ -43,7 +43,7 @@ OtherPos = {
 ScreenInput1 = {
 	inputX = 0,
 	inputY = 0,
-	pressed = 0,
+	pressed = false,
 	mapScreenX = 0,
 	mapScreenY = 0
 }
@@ -51,9 +51,19 @@ ScreenInput1 = {
 ScreenInput2 = {
 	inputX = 0,
 	inputY = 0,
-	pressed = 0,
+	pressed = false,
 	mapScreenX = 0,
 	mapScreenY = 0
+}
+
+RemoveFirstWaypoint = {
+	pressed = false,
+	pressedTick = false
+}
+
+RemoveActiveWaypoint = {
+	pressed = false,
+	pressedTick = false
 }
 
 function AddWaypoint(wp)
@@ -84,9 +94,10 @@ end
 
 function onTick()
 	if ActiveWaypoint < 0 then ActiveWaypoint = 0 end
-	output.setNumber(1, WaypointCount)
-	output.setNumber(2, ActiveWaypoint)
-	output.setNumber(3, ScreenInput1.inputX)
+	if WaypointCount > 0 then
+		output.setNumber(1, Waypoints[1].mapX)
+		output.setNumber(2, Waypoints[1].mapY)
+	end
 	ZoomLevel = input.getNumber(7)
 	PanBy = ZoomLevel * PanSpeed
 	CurrentPos.mapX = input.getNumber(8)
@@ -113,6 +124,8 @@ function onTick()
 	NextWaypoint.pressed = input.getBool(8)
 	CenterOnShip = input.getBool(9)
 	CenterOnOther = input.getBool(10)
+	RemoveFirstWaypoint.pressed = input.getBool(11)
+	RemoveActiveWaypoint.pressed = input.getBool(12)
 
 	if PanLeft then
 		MapCenter.X = MapCenter.X - PanBy
@@ -134,7 +147,19 @@ function onTick()
 		LastWaypoint.pressedTick = false
 	elseif NextWaypoint.pressed == false and NextWaypoint.pressedTick == true then
 		NextWaypoint.pressedTick = false
+	elseif RemoveFirstWaypoint.pressed == false and RemoveFirstWaypoint.pressedTick == true then
+		RemoveFirstWaypoint.pressedTick = false
+	elseif RemoveActiveWaypoint.pressed == false and RemoveActiveWaypoint.pressedTick == true then
+		RemoveActiveWaypoint.pressedTick = false
 
+	elseif RemoveFirstWaypoint.pressed and RemoveFirstWaypoint.pressedTick == false then
+		table.remove(Waypoints, 1)
+		WaypointCount = WaypointCount - 1
+
+	elseif RemoveActiveWaypoint.pressed and RemoveActiveWaypoint.pressedTick == false then
+		table.remove(Waypoints, ActiveWaypoint)
+		WaypointCount = WaypointCount - 1
+		
 	elseif LastWaypoint.pressed and LastWaypoint.pressedTick == false then
 		LastWaypoint.pressedTick = true
 		if ActiveWaypoint > 0 then
