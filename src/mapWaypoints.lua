@@ -114,6 +114,9 @@ function onTick()
 	if WaypointCount > 0 and Waypoints[1].mapX then
 		output.setNumber(1, Waypoints[1].mapX)
 		output.setNumber(2, Waypoints[1].mapY)
+	else
+		output.setNumber(1, 0)
+		output.setNumber(2, 0)
 	end
 
 	ZoomLevel = input.getNumber(7)
@@ -176,6 +179,9 @@ function onTick()
 	elseif RemoveFirstWaypoint.pressed and not RemoveFirstWaypoint.pressedTick then
 		RemoveWaypoint(1)
 		RemoveFirstWaypoint.pressedTick = true
+		if WaypointCount == 0 then
+			output.setBool(1, true)
+		end
 
 	elseif RemoveActiveWaypoint.pressed and not RemoveActiveWaypoint.pressedTick then
 		RemoveWaypoint(ActiveWaypoint)

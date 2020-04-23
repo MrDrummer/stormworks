@@ -5,6 +5,7 @@
         "onTick",
         "onDraw",
         "screen",
-        "output"
+        "output",
+        "property"
     ]
 }
